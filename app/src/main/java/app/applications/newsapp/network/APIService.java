@@ -14,7 +14,7 @@ public interface APIService {
      * We would be changing the pageSize and the page
      */
     @GET("/v2/everything")
-    Call<NewsApiResponse> fetchFeed(@Query("q") String q,
+    Call<NewsApiResponse> fetchFeed(@Query("sources") String sources,
                                     @Query("apiKey") String apiKey,
                                     @Query("page") long page,
                                     @Query("pageSize") int pageSize);
