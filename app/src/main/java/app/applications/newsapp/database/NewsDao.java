@@ -18,6 +18,6 @@ public interface NewsDao {
     @Query("DELETE FROM article_table")
     void deleteAll();
 
-    @Query("SELECT * from article_table ORDER BY pk DESC")
+    @Query("SELECT * from article_table") //  ORDER BY pk DESC
     DataSource.Factory<Integer, Article> getArticles();
 }
