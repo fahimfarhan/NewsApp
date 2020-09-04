@@ -18,4 +18,8 @@ public interface APIService {
                                     @Query("apiKey") String apiKey,
                                     @Query("page") long page,
                                     @Query("pageSize") int pageSize);
+
+    @GET("/v2/top-headlines")
+    Call<NewsApiResponse> fetchStories(@Query("sources") String sources,
+                                    @Query("apiKey") String apiKey);
 }
