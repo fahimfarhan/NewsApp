@@ -96,7 +96,7 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public fun setImages(images: ArrayList<String>) {
+    public fun submitImages(images: ArrayList<String>) {
         this.images = images;
         notifyDataSetChanged();
     }

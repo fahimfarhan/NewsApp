@@ -39,13 +39,17 @@ class MainActivity : AppCompatActivity() {
 
         this.newsViewModel = ViewModelProvider(this).get(NewsViewModel::class.java);
 
-        newsViewModel.newsRepository.liveArticleList.observe(this, Observer<PagedList<Article>> {
+        this.newsViewModel.newsRepository.liveArticleList.observe(this, Observer<PagedList<Article>> {
             pagedList -> newsFeedAdapter?.submitList(pagedList);
-        })
+        });
 
-        newsViewModel.newsRepository.liveLoaderState.observe(this, Observer<LoaderState>{
+        this.newsViewModel.newsRepository.liveLoaderState.observe(this, Observer<LoaderState>{
             newState -> newsFeedAdapter?.setLoaderState(newState);
-        })
+        });
+
+        this.newsViewModel.newsRepository.liveImagesList.observe(this, Observer<ArrayList<String>>{
+            imagesList -> newsFeedAdapter?.submitImages(imagesList);
+        });
     }
 
     /** private methods */
