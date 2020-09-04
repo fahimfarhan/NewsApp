@@ -2,6 +2,16 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+def getNewsApiKey() {
+//    in local.properties
+//    ...
+//    newsApiKey=1234someapikey4567
+//
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("newsApiKey");
+}
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -12,7 +22,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "String", "NEWS_API_KEY", "\""+getNewsApiKey()+"\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
