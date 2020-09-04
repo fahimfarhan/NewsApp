@@ -63,3 +63,10 @@ Open the `NewsBoundaryCallback.kt` file and add the following code:
         };
     }
 ```
+
+Basically we have to write some codes in `onZeroItemsLoaded()` and `onItemAtEndLoaded()` methods. We have
+PagingRequestHelper helper. Inside `Helper.runIfNotRunning` we conplete this lambda. This is where we
+write our networking code. Just some trivial retrofit call. On success, we insert the result in our database.
+If we run our code, we'll see something like this! :tada: :fire:
+
+![first success](first_success.png)
