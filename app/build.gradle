@@ -2,11 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+
+/*@brief:
+*     in local.properties
+*    ...
+*    newsApiKey=1234someapikey4567
+*/
 def getNewsApiKey() {
-//    in local.properties
-//    ...
-//    newsApiKey=1234someapikey4567
-//
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
     return properties.getProperty("newsApiKey");
