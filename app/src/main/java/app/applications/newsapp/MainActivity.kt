@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main);
         initGui();
         initList();
-
+        loadStories();
         liveArticleList.observe(this, Observer<PagedList<Article>> {
             pagedList -> newsFeedAdapter?.submitList(pagedList);
         })
@@ -79,7 +79,27 @@ class MainActivity : AppCompatActivity() {
         return livePageListBuilder
     }
 
-    // ---------------------------------------
+    // optional
+    private fun loadStories() {
+       var call: Call<NewsApiResponse> =  RetrofitClient.getService().fetchStories("cnn", Const.API_KEY);
+        call.enqueue(object : Callback<NewsApiResponse>{
+            override fun onResponse(
+                call: Call<NewsApiResponse>,
+                response: Response<NewsApiResponse>
+            ) {
+                var articles:List<Article> = response.body()?.articles ?: listOf();
+                var imagesList:ArrayList<String> = articles.map { it.urlToImage } as ArrayList<String>;
+                newsFeedAdapter?.setImages(images = imagesList);
+            }
+
+            override fun onFailure(call: Call<NewsApiResponse>, t: Throwable) {
+                Log.e(TAG, "story loading failed");
+            }
+
+        })
+    }
+
+    // test ---------------------------------------
     private fun isApiWorkingTest() {
         // working!
         var call:Call<NewsApiResponse> = RetrofitClient.getService().fetchFeed("bbc-news", Const.API_KEY, 1, 30);

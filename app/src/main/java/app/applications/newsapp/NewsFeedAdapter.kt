@@ -25,6 +25,7 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
 
     /** Variables */
     private var state: LoaderState;
+    private var images: java.util.ArrayList<String> = ArrayList();
 
     /** Konstructors */
     public constructor():super(ArticlesDiffUtilCallBack()) {  // <-- bcz it's similar to java
@@ -57,6 +58,8 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
 
         if(uiPosition < OFFSET_KOUNT) {
             // top row
+            var storiesViewHolder: StoriesViewHolder = holder as StoriesViewHolder;
+            storiesViewHolder.bind(images);
         }else if(0 <= dataPosition && dataPosition < super.getItemCount()) {
             var article: Article? = getItem(dataPosition);
             var articleViewHolder:ArticleViewHolder = holder as ArticleViewHolder;
@@ -90,6 +93,11 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
     /** public apis */
     public fun setLoaderState(newState: LoaderState) {
         this.state = newState;
+        notifyDataSetChanged();
+    }
+
+    public fun setImages(images: ArrayList<String>) {
+        this.images = images;
         notifyDataSetChanged();
     }
 }
