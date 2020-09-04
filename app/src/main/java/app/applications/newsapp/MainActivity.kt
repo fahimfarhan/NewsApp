@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var liveArticleList: LiveData<PagedList<Article>>;
     private lateinit var newsFeedRecyclerView:RecyclerView;
     private var newsFeedAdapter:NewsFeedAdapter? = null;
+    private var liveLoaderState: MutableLiveData<LoaderState> = MutableLiveData();
 
     /** Constructors */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         liveArticleList.observe(this, Observer<PagedList<Article>> {
             pagedList -> newsFeedAdapter?.submitList(pagedList);
+        })
+
+        liveLoaderState.observe(this, Observer<LoaderState>{
+            newState -> newsFeedAdapter?.setLoaderState(newState);
         })
     }
 
@@ -68,7 +74,8 @@ class MainActivity : AppCompatActivity() {
             database.newsDao().articles,
             config);
 
-        livePageListBuilder.setBoundaryCallback(NewsBoundaryCallback(database));
+        var newsBoundaryCallback:NewsBoundaryCallback = NewsBoundaryCallback(database, liveLoaderState);
+        livePageListBuilder.setBoundaryCallback(newsBoundaryCallback);
         return livePageListBuilder
     }
 

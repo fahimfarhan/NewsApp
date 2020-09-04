@@ -23,9 +23,12 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
         val FOOTER_TYPE = 2;
     }
 
+    /** Variables */
+    private var state: LoaderState;
+
     /** Konstructors */
     public constructor():super(ArticlesDiffUtilCallBack()) {  // <-- bcz it's similar to java
-
+        this.state = LoaderState.LOADING;
     }
 
     /** overriden methods */
@@ -80,7 +83,20 @@ class NewsFeedAdapter : PagedListAdapter<Article, RecyclerView.ViewHolder> {
         return FOOTER_TYPE;
     }
 
+    override fun getItemCount(): Int {
+        return OFFSET_KOUNT + super.getItemCount() + isLoading();
+    }
+
     /** private methods */
+    fun isLoading():Int {
+        if(state.equals(LoaderState.LOADING))
+            return 1;
+        return 0;
+    }
 
     /** public apis */
+    public fun setLoaderState(newState: LoaderState) {
+        this.state = newState;
+        notifyDataSetChanged();
+    }
 }

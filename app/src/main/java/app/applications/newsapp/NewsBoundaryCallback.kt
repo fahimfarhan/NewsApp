@@ -27,14 +27,16 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
     private val executor: ExecutorService;
     private val helper: PagingRequestHelper;
     private var pageNumber:Long;
+    private var liveLoaderState: MutableLiveData<LoaderState>;
 
     /** Konstructors */
-    constructor(ndb: NewsRoomDatabase) {
+    constructor(ndb: NewsRoomDatabase, liveLoaderState: MutableLiveData<LoaderState>) {
         this.db = ndb;
         this.api = RetrofitClient.getService();
         this.executor = Executors.newSingleThreadExecutor();
         this.helper = PagingRequestHelper(executor);
-        pageNumber = 1L;
+        this.liveLoaderState = liveLoaderState;
+        this.pageNumber = 1L;
     }
 
     /** override methods */
@@ -44,6 +46,8 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL){
                 helperCallback: PagingRequestHelper.Request.Callback? ->
             var call:Call<NewsApiResponse> = api.fetchFeed("bbc-news", Const.API_KEY, pageNumber, Const.PAGE_SIZE);
+
+            liveLoaderState.postValue(LoaderState.LOADING);
             call.enqueue(object: Callback<NewsApiResponse>{
                 override fun onResponse(call: Call<NewsApiResponse>, response: Response<NewsApiResponse>) {
                   if(response.isSuccessful && response.body()!=null) {
@@ -54,15 +58,18 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                           pageNumber++;
                           helperCallback?.recordSuccess();
                       }
+                      liveLoaderState.postValue(LoaderState.DONE);
                   }else{
                     Log.e(TAG, "onError");
-                      helperCallback?.recordFailure(Throwable("onError"));
+                    helperCallback?.recordFailure(Throwable("onError"));
+                    liveLoaderState.postValue(LoaderState.ERROR);
                   }
                 }
 
                 override fun onFailure(call: Call<NewsApiResponse>, t: Throwable) {
                     Log.e(TAG, "onFailure");
                     helperCallback?.recordFailure(t);
+                    liveLoaderState.postValue(LoaderState.ERROR);
                 }
 
             })
@@ -74,6 +81,8 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER){
                 helperCallback: PagingRequestHelper.Request.Callback? ->
             var call:Call<NewsApiResponse> = api.fetchFeed("bbc-news", Const.API_KEY, pageNumber, Const.PAGE_SIZE);
+
+            liveLoaderState.postValue(LoaderState.LOADING);
             call.enqueue(object: Callback<NewsApiResponse>{
                 override fun onResponse(call: Call<NewsApiResponse>, response: Response<NewsApiResponse>) {
                     if(response.isSuccessful && response.body()!=null) {
@@ -84,15 +93,18 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                             pageNumber++;
                             helperCallback?.recordSuccess();
                         }
+                        liveLoaderState.postValue(LoaderState.DONE);
                     }else{
                         Log.e(TAG, "onError");
                         helperCallback?.recordFailure(Throwable("onError"));
+                        liveLoaderState.postValue(LoaderState.ERROR);
                     }
                 }
 
                 override fun onFailure(call: Call<NewsApiResponse>, t: Throwable) {
                     Log.e(TAG, "onFailure");
                     helperCallback?.recordFailure(t);
+                    liveLoaderState.postValue(LoaderState.ERROR);
                 }
 
             })
