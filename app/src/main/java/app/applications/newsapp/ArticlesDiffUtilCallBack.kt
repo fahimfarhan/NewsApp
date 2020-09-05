@@ -13,6 +13,6 @@ class ArticlesDiffUtilCallBack : DiffUtil.ItemCallback<Article>() {
     }
 
     override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
-        return oldItem == newItem
+        return oldItem.equals(newItem);
     }
 }
