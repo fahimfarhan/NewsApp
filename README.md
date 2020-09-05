@@ -43,7 +43,7 @@ Please go through the followings:
 
 [9. Add MVVM support](./docs/9-MVVM.md)
 
-[10. Force Refresh on Swipe](force-refresh-on-swipe.md)
+[10. Force Refresh on Swipe](./docs/10-force-refresh-on-swipe.md)
 
 If you have any questions, feel free to ask me and I'll try my utmost to answer you.
 
