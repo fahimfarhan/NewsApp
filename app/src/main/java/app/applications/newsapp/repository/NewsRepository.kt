@@ -66,18 +66,27 @@ class NewsRepository {
             config
         );
 
-        var newsBoundaryCallback: NewsBoundaryCallback = NewsBoundaryCallback(
-            database,
-            liveLoaderState
-        );
-        livePageListBuilder.setBoundaryCallback(newsBoundaryCallback);
+        var lastNewsUpdateTimeMillis:Long = sharedpreferences.getLong(Const.LAST_NEWS_UPDATE_TIME, 0);
+        if(System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS/4) ) {  // once in every 8 hour
+            var newsBoundaryCallback: NewsBoundaryCallback = NewsBoundaryCallback(
+                database,
+                liveLoaderState
+            );
+            livePageListBuilder.setBoundaryCallback(newsBoundaryCallback);
+            // todo: I'm not sure how to handle this properly
+            //       saving time inside boundaryCallBack -> retrofit onResponse sounds weird :/
+            //       I mean too many write operations might take place which is undesirable
+            var editor: SharedPreferences.Editor = sharedpreferences.edit();
+            editor.putLong(Const.LAST_NEWS_UPDATE_TIME, System.currentTimeMillis());
+            editor.apply();
+        }
         return livePageListBuilder
     }
 
     // optional
 
     private fun initStories() {
-        if(System.currentTimeMillis() - sharedpreferences.getLong(Const.LAST_UPDATE_TIME, 0) > Const.ONE_DAY_IN_MILLIS ) {
+        if(System.currentTimeMillis() - sharedpreferences.getLong(Const.LAST_STORIES_UPDATE_TIME, 0) > Const.ONE_DAY_IN_MILLIS ) {
             loadStoriesFromNetwork();
         }else {
 

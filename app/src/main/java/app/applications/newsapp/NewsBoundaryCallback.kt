@@ -46,7 +46,8 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
     /** override methods */
     override fun onZeroItemsLoaded() {
         super.onZeroItemsLoaded();
-
+        Log.e(TAG, "onZeroItemsLoaded()");
+        Log.e(TAG, "pageNumber -> "+pageNumber);
         helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL){
                 helperCallback: PagingRequestHelper.Request.Callback? ->
             var call:Call<NewsApiResponse> = api.fetchFeed("bbc-news", Const.API_KEY, pageNumber, Const.PAGE_SIZE);
@@ -56,6 +57,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                 override fun onResponse(call: Call<NewsApiResponse>, response: Response<NewsApiResponse>) {
                   if(response.isSuccessful && response.body()!=null) {
                       Log.e(TAG, "onSuccess");
+                      Log.e(TAG, "pageNumber -> "+pageNumber);
                       val articles: List<Article>? = response.body()?.articles?.map { it };
                       executor.execute{
                           db.newsDao().insertAll(articles?: listOf()); // ?: listOf(); -> if null create emptyList
@@ -65,6 +67,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                       liveLoaderState.postValue(LoaderState.DONE);
                   }else{
                     Log.e(TAG, "onError");
+                      Log.e(TAG, "pageNumber -> "+pageNumber);
                     helperCallback?.recordFailure(Throwable("onError"));
                     liveLoaderState.postValue(LoaderState.ERROR);
                   }
@@ -72,6 +75,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
 
                 override fun onFailure(call: Call<NewsApiResponse>, t: Throwable) {
                     Log.e(TAG, "onFailure");
+                    Log.e(TAG, "pageNumber -> "+pageNumber);
                     helperCallback?.recordFailure(t);
                     liveLoaderState.postValue(LoaderState.ERROR);
                 }
@@ -82,6 +86,8 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
 
     override fun onItemAtEndLoaded(itemAtEnd: Article) {
         super.onItemAtEndLoaded(itemAtEnd);
+        Log.e(TAG, "onItemAtEndLoaded()");
+        Log.e(TAG, "pageNumber -> "+pageNumber);
         helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER){
                 helperCallback: PagingRequestHelper.Request.Callback? ->
             var call:Call<NewsApiResponse> = api.fetchFeed("bbc-news", Const.API_KEY, pageNumber, Const.PAGE_SIZE);
@@ -91,6 +97,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                 override fun onResponse(call: Call<NewsApiResponse>, response: Response<NewsApiResponse>) {
                     if(response.isSuccessful && response.body()!=null) {
                         Log.e(TAG, "onSuccess");
+                        Log.e(TAG, "pageNumber -> "+pageNumber);
                         val articles: List<Article>? = response.body()?.articles?.map { it };
                         executor.execute{
                             db.newsDao().insertAll(articles?: listOf()); // ?: listOf(); -> if null create emptyList
@@ -100,6 +107,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
                         liveLoaderState.postValue(LoaderState.DONE);
                     }else{
                         Log.e(TAG, "onError");
+                        Log.e(TAG, "pageNumber -> "+pageNumber);
                         helperCallback?.recordFailure(Throwable("onError"));
                         liveLoaderState.postValue(LoaderState.ERROR);
                     }
@@ -107,6 +115,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
 
                 override fun onFailure(call: Call<NewsApiResponse>, t: Throwable) {
                     Log.e(TAG, "onFailure");
+                    Log.e(TAG, "pageNumber -> "+pageNumber);
                     helperCallback?.recordFailure(t);
                     liveLoaderState.postValue(LoaderState.ERROR);
                 }
