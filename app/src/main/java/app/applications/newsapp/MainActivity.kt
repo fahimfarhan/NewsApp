@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
             // todo: refresh
             newsViewModel.newsRepository.forcedRefresh();
+            swipeRefreshLayout.isRefreshing = false;
 
         });
     }

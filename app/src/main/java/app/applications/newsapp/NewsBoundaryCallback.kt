@@ -30,7 +30,7 @@ class NewsBoundaryCallback: PagedList.BoundaryCallback<Article> {
     private var api: APIService;
     private val executor: ExecutorService;
     private val helper: PagingRequestHelper;
-    private var pageNumber:Long;
+    var pageNumber:Long;
     private var liveLoaderState: MutableLiveData<LoaderState>;
 
     /** Konstructors */

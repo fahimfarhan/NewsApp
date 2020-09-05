@@ -11,6 +11,7 @@ import android.os.HandlerThread
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import app.applications.newsapp.Const
@@ -32,17 +33,20 @@ import java.lang.reflect.Type
 class NewsRepository {
 
     private var context: Context;
-    var liveLoaderState: MutableLiveData<LoaderState> = MutableLiveData();
+    var liveLoaderState: MutableLiveData<LoaderState> = MutableLiveData(LoaderState.DONE);
     var liveArticleList: LiveData<PagedList<Article>> = MutableLiveData();
     var liveImagesList:MutableLiveData<ArrayList<String>>;
     var sharedpreferences: SharedPreferences;
     val database: NewsRoomDatabase;
+    var datasourceFactory: DataSource.Factory<Int, Article>;
+    private var newsBoundaryCallback: NewsBoundaryCallback? = null;
     // =getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE)
 
     public constructor(context: Context) {
         this.context = context;
         this.liveImagesList = MutableLiveData();
-       this.database = NewsRoomDatabase.getDatabase(this.context);
+        this.database = NewsRoomDatabase.getDatabase(this.context);
+        this.datasourceFactory = database.newsDao().articles;
         this.sharedpreferences = context.getSharedPreferences(
             Const.PREFERENCE,
             Context.MODE_PRIVATE
@@ -59,26 +63,27 @@ class NewsRepository {
         handler.post(Runnable {
             database.newsDao().deleteAll();
         });
-        initList(isForced = true);
-        initStories(isForced = true);
+        newsBoundaryCallback?.pageNumber = 1L;
+        var dataSource = datasourceFactory.create();
+        dataSource.invalidate();
     }
 
-    private fun initList(isForced: Boolean = false) {
+    private fun initList() {
         val config: PagedList.Config = PagedList.Config.Builder()
             .setPageSize(30)
             .setEnablePlaceholders(false)
             .build();
 
-        liveArticleList = initializedPagedListBuilder(config, isForced).build();
+        liveArticleList = initializedPagedListBuilder(config).build();
 
     }
 
-    private fun initializedPagedListBuilder(config: PagedList.Config, isForced: Boolean = false):
+    private fun initializedPagedListBuilder(config: PagedList.Config):
             LivePagedListBuilder<Int, Article> {
 
 
         val livePageListBuilder = LivePagedListBuilder<Int, Article>(
-            database.newsDao().articles,
+            datasourceFactory,
             config
         );
 
@@ -86,8 +91,8 @@ class NewsRepository {
             Const.LAST_NEWS_UPDATE_TIME,
             0
         );
-        if( isForced || ( System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS/4) ) ) {  // once in every 8 hour
-            var newsBoundaryCallback: NewsBoundaryCallback = NewsBoundaryCallback(
+        if(   System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS/4)  ) {  // once in every 8 hour
+             newsBoundaryCallback = NewsBoundaryCallback(
                 database,
                 liveLoaderState
             );
@@ -104,11 +109,9 @@ class NewsRepository {
 
     // optional
 
-    private fun initStories(isForced: Boolean = false) {
-        if(isForced || ( System.currentTimeMillis() - sharedpreferences.getLong(
-                Const.LAST_STORIES_UPDATE_TIME,
-                0
-            ) > Const.ONE_DAY_IN_MILLIS )  ) {
+    private fun initStories() {
+        if(System.currentTimeMillis() - sharedpreferences.getLong(Const.LAST_STORIES_UPDATE_TIME, 0)
+            > Const.ONE_DAY_IN_MILLIS   ) {
             loadStoriesFromNetwork();
         }else {
 
