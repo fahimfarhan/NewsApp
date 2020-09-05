@@ -1,3 +1,7 @@
+<!--    /**-->
+<!--    * SPDX-License-Identifier: MIT-->
+<!--    * Copyright (c) 2020 Qazi Fahim Farhan-->
+<!--    */-->
 <resources>
     <string name="app_name">NewsApp</string>
     <string name="powered_by_newsapi_org">Powered by <a href="https://newsapi.org/">https://newsapi.org/</a></string>

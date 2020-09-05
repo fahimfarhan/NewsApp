@@ -1,3 +1,7 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2020 Qazi Fahim Farhan
+ */
 package app.applications.newsapp
 
 import android.util.Log

@@ -1,3 +1,9 @@
+/**
+ * source: @url: https://github.com/Quaksire/Android-RoundImageView/blob/master/Android-RoundImageView/src/com/quaksire/android/ui/RoundImageView.java
+ * Thanks to this guy for roundImageView
+ *
+ * */
+
 package app.applications.newsapp.customviews;
 
 

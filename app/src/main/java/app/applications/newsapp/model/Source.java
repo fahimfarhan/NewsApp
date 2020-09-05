@@ -1,3 +1,7 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2020 Qazi Fahim Farhan
+ */
 package app.applications.newsapp.model;
 
 import androidx.annotation.NonNull;
