@@ -16,6 +16,7 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import app.applications.newsapp.database.NewsRoomDatabase
 import app.applications.newsapp.model.Article
 import app.applications.newsapp.model.NewsApiResponse
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
     /** Variables */
     private lateinit var newsViewModel:NewsViewModel;
+    private lateinit var swipeRefreshLayout:SwipeRefreshLayout;
     private lateinit var newsFeedRecyclerView:RecyclerView;
     private var newsFeedAdapter:NewsFeedAdapter? = null;
 
@@ -64,6 +66,13 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager:LinearLayoutManager = LinearLayoutManager(this);
         newsFeedRecyclerView.layoutManager = linearLayoutManager;
         newsFeedRecyclerView.adapter = newsFeedAdapter;
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
+            // todo: refresh
+            newsViewModel.newsRepository.forcedRefresh();
+
+        });
     }
 
     // test ---------------------------------------
