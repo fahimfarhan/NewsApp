@@ -47,3 +47,9 @@ Please go through the followings:
 If you have any questions, feel free to ask me and I'll try my utmost to answer you.
 
 Thank you for reading.
+
+# References
+1. [raywenderlich.com/paging-library-for-android-with-kotlin-creating-infinite-lists](https://www.raywenderlich.com/6948-paging-library-for-android-with-kotlin-creating-infinite-lists)
+2. [mindorks.com/implementing-paging-library-in-android](https://blog.mindorks.com/implementing-paging-library-in-android)
+3. [proandroiddev.com/8-steps-to-implement-paging-library-in-android](https://proandroiddev.com/8-steps-to-implement-paging-library-in-android-d02500f7fffe)
+4. [sharmadhiraj.np/android-paging-library-step-by-step-implementation-guide](https://medium.com/@sharmadhiraj.np/android-paging-library-step-by-step-implementation-guide-75417753d9b9)
