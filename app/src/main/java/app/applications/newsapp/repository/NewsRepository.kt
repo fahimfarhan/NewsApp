@@ -38,19 +38,20 @@ class NewsRepository {
     var liveImagesList:MutableLiveData<ArrayList<String>>;
     var sharedpreferences: SharedPreferences;
     val database: NewsRoomDatabase;
-    var datasourceFactory: DataSource.Factory<Int, Article>;
+
     private var newsBoundaryCallback: NewsBoundaryCallback? = null;
+    private val newsFactory: NewsFactory;
     // =getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE)
 
     public constructor(context: Context) {
         this.context = context;
         this.liveImagesList = MutableLiveData();
         this.database = NewsRoomDatabase.getDatabase(this.context);
-        this.datasourceFactory = database.newsDao().articles;
         this.sharedpreferences = context.getSharedPreferences(
             Const.PREFERENCE,
             Context.MODE_PRIVATE
         );
+        this.newsFactory = NewsFactory(context, liveLoaderState);
         initList();
         initStories();
     }
@@ -63,52 +64,26 @@ class NewsRepository {
         handler.post(Runnable {
             database.newsDao().deleteAll();
         });
-        newsBoundaryCallback?.pageNumber = 1L;
-        var dataSource = datasourceFactory.create();
-        dataSource.invalidate();
+        liveArticleList = newsFactory.getLivePagedArticles(Const.ONLINE);
+        newsFactory.dataSource?.invalidate();
+        // todo: needs an update
     }
 
-    private fun initList() {
-        val config: PagedList.Config = PagedList.Config.Builder()
-            .setPageSize(30)
-            .setEnablePlaceholders(false)
-            .build();
+    fun initList() {
+        var lastNewsUpdateTimeMillis:Long = sharedpreferences.getLong(Const.LAST_NEWS_UPDATE_TIME, 0);
 
-        liveArticleList = initializedPagedListBuilder(config).build();
+        if(   System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS)  ) {  // once in every 8 hour
 
-    }
-
-    private fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Int, Article> {
-
-
-        val livePageListBuilder = LivePagedListBuilder<Int, Article>(
-            datasourceFactory,
-            config
-        );
-
-        var lastNewsUpdateTimeMillis:Long = sharedpreferences.getLong(
-            Const.LAST_NEWS_UPDATE_TIME,
-            0
-        );
-        if(   System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS/4)  ) {  // once in every 8 hour
-             newsBoundaryCallback = NewsBoundaryCallback(
-                database,
-                liveLoaderState
-            );
-            livePageListBuilder.setBoundaryCallback(newsBoundaryCallback);
-            // todo: I'm not sure how to handle this properly
-            //       saving time inside boundaryCallBack -> retrofit onResponse sounds weird :/
-            //       I mean too many write operations might take place which is undesirable
+            this.liveArticleList = newsFactory.getLivePagedArticles(Const.ONLINE);
             var editor: SharedPreferences.Editor = sharedpreferences.edit();
             editor.putLong(Const.LAST_NEWS_UPDATE_TIME, System.currentTimeMillis());
             editor.apply();
+        }else{
+            this.liveArticleList = newsFactory.getLivePagedArticles(Const.OFFLINE);
         }
-        return livePageListBuilder
     }
 
     // optional
-
     private fun initStories() {
         if(System.currentTimeMillis() - sharedpreferences.getLong(Const.LAST_STORIES_UPDATE_TIME, 0)
             > Const.ONE_DAY_IN_MILLIS   ) {
