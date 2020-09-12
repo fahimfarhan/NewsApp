@@ -45,6 +45,8 @@ Please go through the followings:
 
 [10. Force Refresh on Swipe](./docs/10-force-refresh-on-swipe.md)
 
+[11. Factory Pattern For Online and Offline Support](docs/11-Factory-Pattern-For-Online-Offline-Support.md)
+
 If you have any questions, feel free to ask me and I'll try my utmost to answer you.
 
 Thank you for reading.

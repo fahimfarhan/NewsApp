@@ -66,13 +66,12 @@ class NewsRepository {
         });
         liveArticleList = newsFactory.getLivePagedArticles(Const.ONLINE);
         newsFactory.dataSource?.invalidate();
-        // todo: needs an update
     }
 
     fun initList() {
         var lastNewsUpdateTimeMillis:Long = sharedpreferences.getLong(Const.LAST_NEWS_UPDATE_TIME, 0);
 
-        if(   System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS)  ) {  // once in every 8 hour
+        if(   System.currentTimeMillis() - lastNewsUpdateTimeMillis > (Const.ONE_DAY_IN_MILLIS)  ) {  // once daily
 
             this.liveArticleList = newsFactory.getLivePagedArticles(Const.ONLINE);
             var editor: SharedPreferences.Editor = sharedpreferences.edit();
